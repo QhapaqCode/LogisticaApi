@@ -4,6 +4,7 @@ using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
 using RetailProductMicroservice.Infrastructure.Data;
 using RetailProductMicroservice.Infrastructure.Repositories;
+using Microsoft.OpenApi.Models;
 
 namespace RetailProductMicroservice.Api
 {
@@ -35,6 +36,11 @@ namespace RetailProductMicroservice.Api
             services.AddScoped<IMovimientoRepository, MovimientoRepository>();
             services.AddScoped<ISerializableRepository, SerializableRepository>();
             services.AddScoped<IProductoRepository, ProductoRepository>();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetailProductMicroservice API", Version = "v1" });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -45,6 +51,17 @@ namespace RetailProductMicroservice.Api
             }
 
             app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "RetailProductMicroservice API V1");
+            });
 
             app.UseEndpoints(endpoints =>
             {
