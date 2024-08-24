@@ -1,9 +1,4 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using RetailProductMicroservice.Application.Interfaces;
 using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
@@ -28,11 +23,18 @@ namespace RetailProductMicroservice.Api
             services.AddDbContext<RetailProductContext>(options =>
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<ILogisticService, LogisticService>();
-
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<ILogisticRepository, LogisticRepository>();
+            services.AddScoped<IAlmacenService, AlmacenService>();
+            services.AddScoped<IAnaquelService, AnaquelService>();
+            services.AddScoped<IExistenciaService, ExistenciaService>();
+            services.AddScoped<IMovimientoService, MovimientoService>();
+            services.AddScoped<ISerializableService, SerializableService>();
+            services.AddScoped<IProductoService, ProductoService>();
+            services.AddScoped<IAlmacenRepository, AlmacenRepository>();
+            services.AddScoped<IAnaquelRepository, AnaquelRepository>();
+            services.AddScoped<IExistenciaRepository, ExistenciaRepository>();
+            services.AddScoped<IMovimientoRepository, MovimientoRepository>();
+            services.AddScoped<ISerializableRepository, SerializableRepository>();
+            services.AddScoped<IProductoRepository, ProductoRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
