@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using RetailProductMicroservice.Application.Interfaces;
 using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
 using RetailProductMicroservice.Infrastructure.Data;
 using RetailProductMicroservice.Infrastructure.Repositories;
-using Microsoft.OpenApi.Models;
+using RetailProductMicroservice.Api.Services;
 
 namespace RetailProductMicroservice.Api
 {
@@ -41,9 +42,12 @@ namespace RetailProductMicroservice.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetailProductMicroservice API", Version = "v1" });
             });
+
+            // Registrar DatabaseInitializer
+            services.AddSingleton<DatabaseInitializer>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -62,6 +66,9 @@ namespace RetailProductMicroservice.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "RetailProductMicroservice API V1");
             });
+
+            // Ejecutar DatabaseInitializer
+            databaseInitializer.Initialize();
 
             app.UseEndpoints(endpoints =>
             {
