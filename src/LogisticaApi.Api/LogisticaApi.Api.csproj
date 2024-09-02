@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RetailProduct.Application\RetailProduct.Application.csproj" />
-    <ProjectReference Include="..\RetailProduct.Domain\RetailProduct.Domain.csproj" />
-    <ProjectReference Include="..\RetailProduct.Infrastructure\RetailProduct.Infrastructure.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Application\LogisticaApi.Application.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Domain\LogisticaApi.Domain.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Infrastructure\LogisticaApi.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RetailProduct.Api\RetailProduct.Api.csproj" />
-    <ProjectReference Include="..\RetailProduct.Application\RetailProduct.Application.csproj" />
-    <ProjectReference Include="..\RetailProduct.Domain\RetailProduct.Domain.csproj" />
-    <ProjectReference Include="..\RetailProduct.Infrastructure\RetailProduct.Infrastructure.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Api\LogisticaApi.Api.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Application\LogisticaApi.Application.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Domain\LogisticaApi.Domain.csproj" />
+    <ProjectReference Include="..\LogisticaApi.Infrastructure\LogisticaApi.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
