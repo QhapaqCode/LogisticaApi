@@ -55,6 +55,7 @@ namespace RetailProductMicroservice.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _almacenService.DeleteAlmacenAsync(id);
+            //return NoContent(); 111
             return NoContent();
         }
     }
