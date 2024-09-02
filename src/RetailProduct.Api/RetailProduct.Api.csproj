@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RetailProductMicroservice.Application\RetailProductMicroservice.Application.csproj" />
-    <ProjectReference Include="..\RetailProductMicroservice.Domain\RetailProductMicroservice.Domain.csproj" />
-    <ProjectReference Include="..\RetailProductMicroservice.Infrastructure\RetailProductMicroservice.Infrastructure.csproj" />
+    <ProjectReference Include="..\RetailProduct.Application\RetailProduct.Application.csproj" />
+    <ProjectReference Include="..\RetailProduct.Domain\RetailProduct.Domain.csproj" />
+    <ProjectReference Include="..\RetailProduct.Infrastructure\RetailProduct.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
