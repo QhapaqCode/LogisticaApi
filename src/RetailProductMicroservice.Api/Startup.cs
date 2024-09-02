@@ -20,11 +20,22 @@ namespace RetailProductMicroservice.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+        
             services.AddControllers();
-
+        
             services.AddDbContext<RetailProductContext>(options =>
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
-
+        
             services.AddScoped<IAlmacenService, AlmacenService>();
             services.AddScoped<IAnaquelService, AnaquelService>();
             services.AddScoped<IExistenciaService, ExistenciaService>();
@@ -37,12 +48,12 @@ namespace RetailProductMicroservice.Api
             services.AddScoped<IMovimientoRepository, MovimientoRepository>();
             services.AddScoped<ISerializableRepository, SerializableRepository>();
             services.AddScoped<IProductoRepository, ProductoRepository>();
-
+        
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetailProductMicroservice API", Version = "v1" });
             });
-
+        
             // Registrar DatabaseInitializer
             services.AddSingleton<DatabaseInitializer>();
         }
@@ -54,7 +65,13 @@ namespace RetailProductMicroservice.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseCors("AllowAllOrigins");
+
+            // app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -67,7 +84,6 @@ namespace RetailProductMicroservice.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "RetailProductMicroservice API V1");
             });
 
-            // Ejecutar DatabaseInitializer
             databaseInitializer.Initialize();
 
             app.UseEndpoints(endpoints =>
