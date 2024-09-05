@@ -22,14 +22,14 @@ jobs:
           git config --global user.email "genomikel@gmail.com"
           git config --global user.name "Henry"
 
+      - name: Add Azure DevOps remote
+        run: |
+          git remote add azure-origin https://qhapaqcode.visualstudio.com/_git/LogisticaApi
+
       - name: Push changes to Azure Repos
         run: |
-          git remote add azure-origin https://$(AZURE_DEVOPS_PAT)@qhapaqcode.visualstudio.com/_git/LogisticaApi
           git push azure-origin --all --force
         env:
-          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
-          
-      - name: Debug Git
-        run: |
-          git config --list
-          git remote -v
+          GIT_ASKPASS: echo
+          GIT_USERNAME: ${{ secrets.AZURE_DEVOPS_PAT }}
+          GIT_PASSWORD: ${{ secrets.AZURE_DEVOPS_PAT }}
