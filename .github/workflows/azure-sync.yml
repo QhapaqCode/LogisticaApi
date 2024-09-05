@@ -3,7 +3,7 @@ name: Sync to Azure Repos
 on:
   push:
     branches:
-      - '**' # Cambia 'main' por la rama que quieras sincronizar
+      - '**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -17,10 +17,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Setup Git
+      - name: Configure Git
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.email "genomikel@gmail.com"
+          git config --global user.name "Henry"
 
       - name: Push changes to Azure Repos
         run: |
