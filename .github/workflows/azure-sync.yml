@@ -25,7 +25,7 @@ jobs:
       - name: Configure Git credentials
         run: |
           git config --global credential.helper store
-          echo "https://$(AZURE_DEVOPS_PAT):$(AZURE_DEVOPS_PAT)@qhapaqcode.visualstudio.com/_git/LogisticaApi" > ~/.git-credentials
+          echo "https://${{ secrets.AZURE_DEVOPS_PAT }}:x-oauth-basic@qhapaqcode.visualstudio.com/_git/LogisticaApi" > ~/.git-credentials
         env:
           AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
 
