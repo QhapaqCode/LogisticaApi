@@ -33,3 +33,10 @@ jobs:
           GIT_ASKPASS: echo
           GIT_USERNAME: ${{ secrets.AZURE_DEVOPS_PAT }}
           GIT_PASSWORD: ${{ secrets.AZURE_DEVOPS_PAT }}
+      - name: Configure Git credentials
+        run: |
+          git config --global credential.helper store
+          echo "https://$(AZURE_DEVOPS_PAT):$(AZURE_DEVOPS_PAT)@qhapaqcode.visualstudio.com/_git/LogisticaApi" > ~/.git-credentials
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+
