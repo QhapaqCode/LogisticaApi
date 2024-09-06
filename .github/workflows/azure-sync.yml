@@ -22,6 +22,7 @@ jobs:
           fetch-depth: 0
           
       - name: Validate branch name
+        if: github.event_name == 'create'
         run: |
           if [[ ! ${{ github.ref }} =~ ^refs/heads/(feature|bugfix|release|hotfix|support|develop|master)/ ]]; then
             echo "Branch name does not follow GitFlow naming conventions."
