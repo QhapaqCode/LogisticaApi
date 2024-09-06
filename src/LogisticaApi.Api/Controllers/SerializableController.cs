@@ -54,6 +54,7 @@ namespace RetailProductMicroservice.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            // test 123
             await _serializableService.DeleteSerializableAsync(id);
             return NoContent();
         }

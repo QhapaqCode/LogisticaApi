@@ -1,0 +1,42 @@
+name: Sync to Azure Repos
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - '**'
+  create:
+    branches:
+      - '**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "genomikel@gmail.com"
+          git config --global user.name "Henry"
+
+      - name: Configure Git credentials
+        run: |
+          git config --global credential.helper store
+          echo "https://${{ secrets.AZURE_DEVOPS_PAT }}:x-oauth-basic@qhapaqcode.visualstudio.com/_git/LogisticaApi" > ~/.git-credentials
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+
+      - name: Push changes to Azure Repos
+        run: |
+          git remote add azure-origin https://qhapaqcode.visualstudio.com/_git/LogisticaApi
+          git push azure-origin --all --force
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
