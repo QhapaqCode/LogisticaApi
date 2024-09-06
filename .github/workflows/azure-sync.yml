@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - '**'
-  delete:
+  create:
     branches:
       - '**'
-  create:
+  delete:
     branches:
       - '**'
 
