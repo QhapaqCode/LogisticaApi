@@ -1,0 +1,17 @@
+name: Check Branch Name
+
+on:
+  create:
+    branches:
+      - '*'
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          if [[ ! ${{ github.ref }} =~ ^refs/heads/(feature|bugfix|release|hotfix|support|develop|master)/ ]]; then
+            echo "Branch name does not follow GitFlow naming conventions."
+            exit 1
+          fi
