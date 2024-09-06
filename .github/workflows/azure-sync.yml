@@ -21,14 +21,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate branch name
-        if: github.event_name == 'create'
-        run: |
-          if [[ ! ${{ github.ref }} =~ ^refs/heads/(feature|bugfix|release|hotfix|support|develop|master)/ ]]; then
-            echo "Branch name does not follow GitFlow naming conventions."
-            exit 1
-          fi
-
       - name: Configure Git
         run: |
           git config --global user.email "genomikel@gmail.com"
@@ -48,10 +40,3 @@ jobs:
         env:
           AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
 
-      - name: Delete remote branch
-        if: github.event_name == 'delete'
-        run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          git push azure-origin --delete $BRANCH_NAME
-        env:
-          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
