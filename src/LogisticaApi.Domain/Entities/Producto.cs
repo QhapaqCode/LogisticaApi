@@ -12,7 +12,7 @@ public abstract class Producto
 
     public TipoProducto TipoProducto { get; set; }
 
-    public string Codigo { get; set; }
+    public string Marca { get; set; }
 
     public EstadoEntidad EstadoEntidad { get; set; }
 }

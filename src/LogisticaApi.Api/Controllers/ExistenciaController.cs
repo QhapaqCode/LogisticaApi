@@ -48,7 +48,7 @@ namespace RetailProductMicroservice.API.Controllers
                 return BadRequest();
             }
             await _existenciaService.UpdateExistenciaAsync(existencia);
-            return NoContent();
+            return Ok(existencia);
         }
 
         [HttpDelete("{id}")]

@@ -55,7 +55,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 Nombre = "Serializable Test",
                 Descripcion = "Descripción Test",
                 TipoProducto = TipoProducto.Individual,
-                Codigo = "SER123",
+                Marca = "SER123",
                 Serie = "SERIE123",
                 EstadoProducto = EstadoProducto.Nuevo,
                 EstadoEntidad = EstadoEntidad.Activo
@@ -77,7 +77,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 Nombre = "Serializable Test Actualizado",
                 Descripcion = "Descripción Test Actualizada",
                 TipoProducto = TipoProducto.Accesorio,
-                Codigo = "SER1234",
+                Marca = "SER1234",
                 Serie = "SERIE1234",
                 EstadoProducto = EstadoProducto.Usado,
                 EstadoEntidad = EstadoEntidad.Activo

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RetailProductMicroservice.Api;
 using RetailProductMicroservice.Domain.Entities;
@@ -12,22 +13,24 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
     public class AlmacenControllerTests : IClassFixture<WebApplicationFactory<Startup>>
     {
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly HttpClient _client;
 
         public AlmacenControllerTests(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory;
+            _factory = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.test.json", optional: true, reloadOnChange: true);
+                });
+            });
+            _client = _factory.CreateClient();
         }
 
         [Fact]
         public async Task GetAlmacenes_ReturnsSuccessStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
-
-            // Act
-            var response = await client.GetAsync("/api/almacenes");
-
-            // Assert
+            var response = await _client.GetAsync("/api/almacen");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -35,14 +38,8 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetAlmacen_ReturnsSuccessStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
             var almacenId = 1;
-
-            // Act
-            var response = await client.GetAsync($"/api/almacenes/{almacenId}");
-
-            // Assert
+            var response = await _client.GetAsync($"/api/almacen/{almacenId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -50,22 +47,14 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetAlmacen_ReturnsNotFoundStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
             var almacenId = 999;
-
-            // Act
-            var response = await client.GetAsync($"/api/almacenes/{almacenId}");
-
-            // Assert
+            var response = await _client.GetAsync($"/api/almacen/{almacenId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
         public async Task CreateAlmacen_ReturnsSuccessStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
             var almacen = new Almacen
             {
                 Nombre = "Almacen Test",
@@ -74,11 +63,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 EstadoEntidad = EstadoEntidad.Activo
             };
             var content = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
-
-            // Act
-            var response = await client.PostAsync("/api/almacenes", content);
-
-            // Assert
+            var response = await _client.PostAsync("/api/almacen", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -86,8 +71,6 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateAlmacen_ReturnsSuccessStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
             var almacenId = 1;
             var almacen = new Almacen
             {
@@ -98,11 +81,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 EstadoEntidad = EstadoEntidad.Activo
             };
             var content = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
-
-            // Act
-            var response = await client.PutAsync($"/api/almacenes/{almacenId}", content);
-
-            // Assert
+            var response = await _client.PutAsync($"/api/almacen/{almacenId}", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -110,16 +89,10 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteAlmacen_ReturnsSuccessStatusCode()
         {
-            // Arrange
-            var client = _factory.CreateClient();
             var almacenId = 1;
-
-            // Act
-            var response = await client.DeleteAsync($"/api/almacenes/{almacenId}");
-
-            // Assert
+            var response = await _client.DeleteAsync($"/api/almacen/{almacenId}");
             response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

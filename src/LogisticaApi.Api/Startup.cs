@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RetailProductMicroservice.Api.Services;
+using RetailProductMicroservice.API.Controllers;
 using RetailProductMicroservice.Application.Interfaces;
 using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
 using RetailProductMicroservice.Infrastructure.Data;
 using RetailProductMicroservice.Infrastructure.Repositories;
-using RetailProductMicroservice.Api.Services;
 
 namespace RetailProductMicroservice.Api
 {
@@ -18,7 +19,7 @@ namespace RetailProductMicroservice.Api
             _configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
             {
@@ -30,12 +31,25 @@ namespace RetailProductMicroservice.Api
                                .AllowAnyHeader();
                     });
             });
-        
+
             services.AddControllers();
-        
-            services.AddDbContext<RetailProductContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
-        
+
+            //services.AddDbContext<RetailProductContext>(options =>
+            //    options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+
+            bool useInMemoryDatabase = _configuration.GetValue<bool>("UseInMemoryDatabase");
+            if (useInMemoryDatabase)
+            {
+                services.AddDbContext<RetailProductContext>(options =>
+                    options.UseInMemoryDatabase("InMemoryDbForTesting"));
+            }
+            else
+            {
+                // Configura la base de datos real aquí
+                services.AddDbContext<RetailProductContext>(options =>
+                    options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+            }
+
             services.AddScoped<IAlmacenService, AlmacenService>();
             services.AddScoped<IAnaquelService, AnaquelService>();
             services.AddScoped<IExistenciaService, ExistenciaService>();
@@ -48,17 +62,18 @@ namespace RetailProductMicroservice.Api
             services.AddScoped<IMovimientoRepository, MovimientoRepository>();
             services.AddScoped<ISerializableRepository, SerializableRepository>();
             services.AddScoped<IProductoRepository, ProductoRepository>();
-        
+
+            services.AddScoped<AlmacenController>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RetailProductMicroservice API", Version = "v1" });
             });
-        
-            // Registrar DatabaseInitializer
+
             services.AddSingleton<DatabaseInitializer>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
         {
             if (env.IsDevelopment())
             {
