@@ -25,12 +25,12 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 });
             });
             _client = _factory.CreateClient();
-
-            InitializeDatabaseAsync().Wait();
         }
 
         private async Task InitializeDatabaseAsync()
         {
+            await _client.DeleteAsync("/api/existencia/clear");
+
             var existencia = new Existencia
             {
                 Nombre = "Otra Existencia Test",
@@ -50,6 +50,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetExistencias_ReturnsSuccessStatusCode()
         {
+            await InitializeDatabaseAsync();
             var response = await _client.GetAsync("/api/existencia");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -58,6 +59,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetExistencia_ReturnsSuccessStatusCode()
         {
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
             var response = await _client.GetAsync($"/api/existencia/{existenciaId}");
             response.EnsureSuccessStatusCode();
@@ -67,6 +69,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetExistencia_ReturnsNotFoundStatusCode()
         {
+            await InitializeDatabaseAsync();
             var existenciaId = 999;
             var response = await _client.GetAsync($"/api/existencia/{existenciaId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -96,6 +99,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateExistencia_ReturnsSuccessStatusCode()
         {
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
             var existencia = new Existencia
             {
@@ -119,6 +123,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteExistencia_ReturnsSuccessStatusCode()
         {
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
             var response = await _client.DeleteAsync($"/api/existencia/{existenciaId}");
             response.EnsureSuccessStatusCode();

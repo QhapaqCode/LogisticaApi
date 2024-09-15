@@ -2,7 +2,7 @@
 
 namespace RetailProductMicroservice.Domain.Entities;
 
-public abstract class Producto
+public class Producto
 {
     public int Id { get; set; }
 

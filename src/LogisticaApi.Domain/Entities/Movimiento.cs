@@ -1,4 +1,5 @@
 ﻿using RetailProductMicroservice.Domain.ValueObjects;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RetailProductMicroservice.Domain.Entities;
 
@@ -14,9 +15,10 @@ public class Movimiento
 
     public UnidadMedida UnidadMedida { get; set; }
 
-    public int AlmacenId { get; set; }
+    public int? AlmacenId { get; set; }
 
-    public Almacen Almacen { get; set; }
+    [ForeignKey("AlmacenId")]
+    public Almacen? Almacen { get; set; }
 
     public string Descripcion { get; set; }
 
@@ -24,11 +26,13 @@ public class Movimiento
 
     public int? AnaquelId { get; set; }
 
-    public Anaquel Anaquel { get; set; }
+    [ForeignKey("AnaquelId")]
+    public Anaquel? Anaquel { get; set; }
 
     public int ProductoId { get; set; }
 
-    public Producto Producto { get; set; }
+    [ForeignKey("ProductoId")]
+    public Producto? Producto { get; set; }
 
     public EstadoEntidad EstadoEntidad { get; set; }
 }

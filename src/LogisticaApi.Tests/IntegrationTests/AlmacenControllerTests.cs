@@ -7,6 +7,7 @@ using RetailProductMicroservice.Domain.ValueObjects;
 using System.Net;
 using System.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RetailProductMicroservice.Tests.IntegrationTests
 {
@@ -14,8 +15,11 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
     {
         private readonly WebApplicationFactory<Startup> _factory;
         private readonly HttpClient _client;
+        private static readonly object _lock = new object();
+        private static int _nextId = 1;
+        private readonly ITestOutputHelper _testOutputHelper;
 
-        public AlmacenControllerTests(WebApplicationFactory<Startup> factory)
+        public AlmacenControllerTests(WebApplicationFactory<Startup> factory, ITestOutputHelper testOutputHelper)
         {
             _factory = factory.WithWebHostBuilder(builder =>
             {
@@ -25,6 +29,28 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 });
             });
             _client = _factory.CreateClient();
+            _testOutputHelper = testOutputHelper;
+        }
+
+        private async Task<int> InsertandoNuevoAlmacen()
+        {
+            int nuevoAlmacenId;
+            lock (_lock)
+                nuevoAlmacenId = _nextId++;
+
+            var almacen = new Almacen
+            {
+                Id = nuevoAlmacenId,
+                Nombre = "Almacen Test",
+                Direccion = "Dirección Test",
+                TipoAlmacen = TipoAlmacen.Almacen,
+                EstadoEntidad = EstadoEntidad.Activo
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
+            await _client.PostAsync("/api/almacen", content);
+
+            return nuevoAlmacenId;
         }
 
         [Fact]
@@ -38,7 +64,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetAlmacen_ReturnsSuccessStatusCode()
         {
-            var almacenId = 1;
+            var almacenId = await InsertandoNuevoAlmacen();
             var response = await _client.GetAsync($"/api/almacen/{almacenId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -57,6 +83,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         {
             var almacen = new Almacen
             {
+                Id = 998,
                 Nombre = "Almacen Test",
                 Direccion = "Dirección Test",
                 TipoAlmacen = TipoAlmacen.Almacen,
@@ -64,6 +91,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
             };
             var content = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/api/almacen", content);
+            _testOutputHelper.WriteLine(await response.Content.ReadAsStringAsync());
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -71,7 +99,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateAlmacen_ReturnsSuccessStatusCode()
         {
-            var almacenId = 1;
+            var almacenId = await InsertandoNuevoAlmacen();
             var almacen = new Almacen
             {
                 Id = almacenId,
@@ -89,7 +117,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteAlmacen_ReturnsSuccessStatusCode()
         {
-            var almacenId = 1;
+            var almacenId = await InsertandoNuevoAlmacen();
             var response = await _client.DeleteAsync($"/api/almacen/{almacenId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

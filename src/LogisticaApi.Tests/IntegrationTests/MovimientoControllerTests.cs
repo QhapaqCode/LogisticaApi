@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RetailProductMicroservice.Api;
@@ -14,6 +15,8 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
     {
         private readonly WebApplicationFactory<Startup> _factory;
         private readonly HttpClient _client;
+        private static readonly object _lock = new object();
+        private static int _nextId = 1;
 
         public MovimientoControllerTests(WebApplicationFactory<Startup> factory)
         {
@@ -25,14 +28,18 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 });
             });
             _client = _factory.CreateClient();
-
-            InitializeDatabaseAsync().Wait();
+            InicializandoEntidades().Wait();
         }
 
-        private async Task InitializeDatabaseAsync()
+        private async Task InicializandoEntidades()
         {
+            int movimientoId;
+            lock (_lock)
+                movimientoId = _nextId++;
+
             var almacen = new Almacen
             {
+                Id = 1,
                 Nombre = "Almacen Test",
                 Direccion = "Dirección Test",
                 TipoAlmacen = TipoAlmacen.Almacen,
@@ -40,6 +47,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
             };
             var anaquel = new Anaquel
             {
+                Id = 1,
                 Codigo = "A1",
                 Fila = 1,
                 Columna = 1,
@@ -49,15 +57,34 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
             };
             var existencia = new Existencia
             {
-                Nombre = "Existencia Test",
-                Descripcion = "Descripción Test",
-                Codigo = "EX123",
-                UnidadMedida = UnidadMedida.Kilogramo,
+                Id = 1,
+                Nombre = "Otra Existencia Test",
+                Descripcion = "Otra Descripción Test",
+                TipoProducto = TipoProducto.Individual,
+                Marca = "Generico",
                 EstadoEntidad = EstadoEntidad.Activo,
-                TipoProducto = TipoProducto.Individual
+                Codigo = "EX124",
+                UnidadMedida = UnidadMedida.Kilogramo
             };
+
+            var almacenContent = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
+            var anaquelContent = new StringContent(JsonConvert.SerializeObject(anaquel), Encoding.UTF8, "application/json");
+            var existenciaContent = new StringContent(JsonConvert.SerializeObject(existencia), Encoding.UTF8, "application/json");
+
+            await _client.PostAsync("/api/almacen", almacenContent);
+            await _client.PostAsync("/api/anaquel", anaquelContent);
+            await _client.PostAsync("/api/existencia", existenciaContent);
+        }
+
+        private async Task<int> InsertandoMovimiento()
+        {
+            int nuevoMovimientoId;
+            lock (_lock)
+                nuevoMovimientoId = _nextId++;
+
             var movimiento = new Movimiento
             {
+                Id = nuevoMovimientoId,
                 Fecha = DateTime.UtcNow,
                 Direccion = DireccionMovimiento.Entrada,
                 Cantidad = 100,
@@ -65,14 +92,14 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 AlmacenId = 1,
                 Descripcion = "Movimiento Test",
                 Motivo = MotivoMovimiento.Compra,
+                AnaquelId = 1,
                 ProductoId = 1,
-                EstadoEntidad = EstadoEntidad.Activo,
-                Almacen = almacen,
-                Anaquel = anaquel,
-                Producto = existencia
+                EstadoEntidad = EstadoEntidad.Activo
             };
-            var content = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
-            await _client.PostAsync("/api/movimiento", content);
+
+            var movimientoContent = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
+            await _client.PostAsync("/api/movimiento", movimientoContent);
+            return nuevoMovimientoId;
         }
 
         [Fact]
@@ -86,7 +113,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetMovimiento_ReturnsSuccessStatusCode()
         {
-            var movimientoId = 1;
+            var movimientoId = await InsertandoMovimiento();
             var response = await _client.GetAsync($"/api/movimiento/{movimientoId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -103,18 +130,25 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task CreateMovimiento_ReturnsSuccessStatusCode()
         {
+            int nuevoMovimientoId;
+            lock (_lock)
+                nuevoMovimientoId = _nextId++;
+
             var movimiento = new Movimiento
             {
+
                 Fecha = DateTime.UtcNow,
                 Direccion = DireccionMovimiento.Entrada,
                 Cantidad = 100,
                 UnidadMedida = UnidadMedida.Kilogramo,
-                AlmacenId = 2,
-                Descripcion = "Otro Movimiento Test",
+                AlmacenId = 1,
+                Descripcion = "Movimiento Test",
                 Motivo = MotivoMovimiento.Compra,
-                ProductoId = 2,
+                AnaquelId = 1,
+                ProductoId = 1,
                 EstadoEntidad = EstadoEntidad.Activo
             };
+
             var content = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
             var response = await _client.PostAsync("/api/movimiento", content);
             response.EnsureSuccessStatusCode();
@@ -124,7 +158,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateMovimiento_ReturnsSuccessStatusCode()
         {
-            var movimientoId = 1;
+            var movimientoId = await InsertandoMovimiento();
             var movimiento = new Movimiento
             {
                 Id = movimientoId,
@@ -138,6 +172,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 ProductoId = 1,
                 EstadoEntidad = EstadoEntidad.Activo
             };
+
             var content = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
             var response = await _client.PutAsync($"/api/movimiento/{movimientoId}", content);
             response.EnsureSuccessStatusCode();
@@ -147,7 +182,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteMovimiento_ReturnsSuccessStatusCode()
         {
-            var movimientoId = 1;
+            var movimientoId = await InsertandoMovimiento();
             var response = await _client.DeleteAsync($"/api/movimiento/{movimientoId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

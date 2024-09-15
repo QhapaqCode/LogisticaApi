@@ -57,5 +57,12 @@ namespace RetailProductMicroservice.API.Controllers
             await _existenciaService.DeleteExistenciaAsync(id);
             return NoContent();
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Clear()
+        {
+            await _existenciaService.Clear();
+            return NoContent();
+        }
     }
 }
