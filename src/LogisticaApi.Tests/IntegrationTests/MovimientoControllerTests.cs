@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RetailProductMicroservice.Api;
 using RetailProductMicroservice.Domain.Entities;
@@ -12,46 +14,77 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
     public class MovimientoControllerTests : IClassFixture<WebApplicationFactory<Startup>>
     {
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly HttpClient _client;
+        private static readonly object _lock = new object();
+        private static int _nextId = 1;
 
         public MovimientoControllerTests(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory;
+            _factory = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.test.json", optional: true, reloadOnChange: true);
+                });
+            });
+            _client = _factory.CreateClient();
+            InicializandoEntidades().Wait();
         }
 
-        [Fact]
-        public async Task GetMovimientos_ReturnsSuccessStatusCode()
+        private async Task InicializandoEntidades()
         {
-            var client = _factory.CreateClient();
-            var response = await client.GetAsync("/api/movimientos");
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            int movimientoId;
+            lock (_lock)
+                movimientoId = _nextId++;
+
+            var almacen = new Almacen
+            {
+                Id = 1,
+                Nombre = "Almacen Test",
+                Direccion = "Dirección Test",
+                TipoAlmacen = TipoAlmacen.Almacen,
+                EstadoEntidad = EstadoEntidad.Activo
+            };
+            var anaquel = new Anaquel
+            {
+                Id = 1,
+                Codigo = "A1",
+                Fila = 1,
+                Columna = 1,
+                AlmacenId = 1,
+                EstadoEntidad = EstadoEntidad.Activo,
+                Almacen = almacen
+            };
+            var existencia = new Existencia
+            {
+                Id = 1,
+                Nombre = "Otra Existencia Test",
+                Descripcion = "Otra Descripción Test",
+                TipoProducto = TipoProducto.Individual,
+                Marca = "Generico",
+                EstadoEntidad = EstadoEntidad.Activo,
+                Codigo = "EX124",
+                UnidadMedida = UnidadMedida.Kilogramo
+            };
+
+            var almacenContent = new StringContent(JsonConvert.SerializeObject(almacen), Encoding.UTF8, "application/json");
+            var anaquelContent = new StringContent(JsonConvert.SerializeObject(anaquel), Encoding.UTF8, "application/json");
+            var existenciaContent = new StringContent(JsonConvert.SerializeObject(existencia), Encoding.UTF8, "application/json");
+
+            await _client.PostAsync("/api/almacen", almacenContent);
+            await _client.PostAsync("/api/anaquel", anaquelContent);
+            await _client.PostAsync("/api/existencia", existenciaContent);
         }
 
-        [Fact]
-        public async Task GetMovimiento_ReturnsSuccessStatusCode()
+        private async Task<int> InsertandoMovimiento()
         {
-            var client = _factory.CreateClient();
-            var movimientoId = 1;
-            var response = await client.GetAsync($"/api/movimientos/{movimientoId}");
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
+            int nuevoMovimientoId;
+            lock (_lock)
+                nuevoMovimientoId = _nextId++;
 
-        [Fact]
-        public async Task GetMovimiento_ReturnsNotFoundStatusCode()
-        {
-            var client = _factory.CreateClient();
-            var movimientoId = 999;
-            var response = await client.GetAsync($"/api/movimientos/{movimientoId}");
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task CreateMovimiento_ReturnsSuccessStatusCode()
-        {
-            var client = _factory.CreateClient();
             var movimiento = new Movimiento
             {
+                Id = nuevoMovimientoId,
                 Fecha = DateTime.UtcNow,
                 Direccion = DireccionMovimiento.Entrada,
                 Cantidad = 100,
@@ -59,11 +92,65 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 AlmacenId = 1,
                 Descripcion = "Movimiento Test",
                 Motivo = MotivoMovimiento.Compra,
+                AnaquelId = 1,
                 ProductoId = 1,
                 EstadoEntidad = EstadoEntidad.Activo
             };
+
+            var movimientoContent = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
+            await _client.PostAsync("/api/movimiento", movimientoContent);
+            return nuevoMovimientoId;
+        }
+
+        [Fact]
+        public async Task GetMovimientos_ReturnsSuccessStatusCode()
+        {
+            var response = await _client.GetAsync("/api/movimiento");
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetMovimiento_ReturnsSuccessStatusCode()
+        {
+            var movimientoId = await InsertandoMovimiento();
+            var response = await _client.GetAsync($"/api/movimiento/{movimientoId}");
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetMovimiento_ReturnsNotFoundStatusCode()
+        {
+            var movimientoId = 999;
+            var response = await _client.GetAsync($"/api/movimiento/{movimientoId}");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateMovimiento_ReturnsSuccessStatusCode()
+        {
+            int nuevoMovimientoId;
+            lock (_lock)
+                nuevoMovimientoId = _nextId++;
+
+            var movimiento = new Movimiento
+            {
+
+                Fecha = DateTime.UtcNow,
+                Direccion = DireccionMovimiento.Entrada,
+                Cantidad = 100,
+                UnidadMedida = UnidadMedida.Kilogramo,
+                AlmacenId = 1,
+                Descripcion = "Movimiento Test",
+                Motivo = MotivoMovimiento.Compra,
+                AnaquelId = 1,
+                ProductoId = 1,
+                EstadoEntidad = EstadoEntidad.Activo
+            };
+
             var content = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("/api/movimientos", content);
+            var response = await _client.PostAsync("/api/movimiento", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -71,8 +158,7 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateMovimiento_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
-            var movimientoId = 1;
+            var movimientoId = await InsertandoMovimiento();
             var movimiento = new Movimiento
             {
                 Id = movimientoId,
@@ -86,8 +172,9 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
                 ProductoId = 1,
                 EstadoEntidad = EstadoEntidad.Activo
             };
+
             var content = new StringContent(JsonConvert.SerializeObject(movimiento), Encoding.UTF8, "application/json");
-            var response = await client.PutAsync($"/api/movimientos/{movimientoId}", content);
+            var response = await _client.PutAsync($"/api/movimiento/{movimientoId}", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -95,11 +182,10 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteMovimiento_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
-            var movimientoId = 1;
-            var response = await client.DeleteAsync($"/api/movimientos/{movimientoId}");
+            var movimientoId = await InsertandoMovimiento();
+            var response = await _client.DeleteAsync($"/api/movimiento/{movimientoId}");
             response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

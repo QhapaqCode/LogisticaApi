@@ -48,7 +48,7 @@ namespace RetailProductMicroservice.API.Controllers
                 return BadRequest();
             }
             await _almacenService.UpdateAlmacenAsync(almacen);
-            return NoContent();
+            return Ok(almacen);
         }
 
         [HttpDelete("{id}")]

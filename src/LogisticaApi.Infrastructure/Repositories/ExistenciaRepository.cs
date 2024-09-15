@@ -47,4 +47,10 @@ public class ExistenciaRepository : IExistenciaRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task Clear()
+    {
+        _context.Existencias.RemoveRange(_context.Existencias);
+        await _context.SaveChangesAsync();
+    }
 }

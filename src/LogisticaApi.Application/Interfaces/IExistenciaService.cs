@@ -13,4 +13,6 @@ public interface IExistenciaService
     Task UpdateExistenciaAsync(Existencia existencia);
 
     Task DeleteExistenciaAsync(int id);
+
+    Task Clear();
 }

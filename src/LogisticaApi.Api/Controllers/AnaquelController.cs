@@ -55,7 +55,7 @@ namespace RetailProductMicroservice.API.Controllers
                 return BadRequest();
             }
             await _anaquelService.UpdateAnaquelAsync(anaquel);
-            return NoContent();
+            return Ok(anaquel);
         }
 
         [HttpDelete("{id}")]

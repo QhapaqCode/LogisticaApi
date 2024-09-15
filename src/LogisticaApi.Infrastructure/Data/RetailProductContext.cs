@@ -28,22 +28,26 @@ namespace RetailProductMicroservice.Infrastructure.Data
             modelBuilder.Entity<Movimiento>()
                 .HasOne(m => m.Almacen)
                 .WithMany()
-                .HasForeignKey(m => m.AlmacenId);
+                .HasForeignKey(m => m.AlmacenId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Movimiento>()
                 .HasOne(m => m.Anaquel)
                 .WithMany()
-                .HasForeignKey(m => m.AnaquelId);
+                .HasForeignKey(m => m.AnaquelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Movimiento>()
                 .HasOne(m => m.Producto)
                 .WithMany()
-                .HasForeignKey(m => m.ProductoId);
+                .HasForeignKey(m => m.ProductoId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Anaquel>()
                 .HasOne(a => a.Almacen)
                 .WithMany()
-                .HasForeignKey(a => a.AlmacenId);
+                .HasForeignKey(a => a.AlmacenId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
