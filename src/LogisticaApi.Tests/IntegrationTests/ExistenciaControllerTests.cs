@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RetailProductMicroservice.Api;
 using RetailProductMicroservice.Domain.Entities;
@@ -12,17 +13,45 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
     public class ExistenciaControllerTests : IClassFixture<WebApplicationFactory<Startup>>
     {
         private readonly WebApplicationFactory<Startup> _factory;
+        private readonly HttpClient _client;
 
         public ExistenciaControllerTests(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory;
+            _factory = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.test.json", optional: true, reloadOnChange: true);
+                });
+            });
+            _client = _factory.CreateClient();
+        }
+
+        private async Task InitializeDatabaseAsync()
+        {
+            await _client.DeleteAsync("/api/existencia/clear");
+
+            var existencia = new Existencia
+            {
+                Nombre = "Otra Existencia Test",
+                Descripcion = "Otra Descripción Test",
+                TipoProducto = TipoProducto.Individual,
+                Marca = "Generico",
+                EstadoEntidad = EstadoEntidad.Activo,
+
+                Codigo = "EX124",
+                UnidadMedida = UnidadMedida.Kilogramo
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(existencia), Encoding.UTF8, "application/json");
+            await _client.PostAsync("/api/existencia", content);
         }
 
         [Fact]
         public async Task GetExistencias_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
-            var response = await client.GetAsync("/api/existencias");
+            await InitializeDatabaseAsync();
+            var response = await _client.GetAsync("/api/existencia");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -30,9 +59,9 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetExistencia_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
-            var response = await client.GetAsync($"/api/existencias/{existenciaId}");
+            var response = await _client.GetAsync($"/api/existencia/{existenciaId}");
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -40,26 +69,29 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task GetExistencia_ReturnsNotFoundStatusCode()
         {
-            var client = _factory.CreateClient();
+            await InitializeDatabaseAsync();
             var existenciaId = 999;
-            var response = await client.GetAsync($"/api/existencias/{existenciaId}");
+            var response = await _client.GetAsync($"/api/existencia/{existenciaId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
         public async Task CreateExistencia_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
             var existencia = new Existencia
             {
-                Nombre = "Existencia Test",
-                Descripcion = "Descripción Test",
-                Codigo = "EX123",
-                UnidadMedida = UnidadMedida.Kilogramo,
-                EstadoEntidad = EstadoEntidad.Activo
+                Nombre = "Otra Existencia Test",
+                Descripcion = "Otra Descripción Test",
+                TipoProducto = TipoProducto.Individual,
+                Marca = "Generico",
+                EstadoEntidad = EstadoEntidad.Activo,
+
+                Codigo = "EX124",
+                UnidadMedida = UnidadMedida.Kilogramo
             };
+
             var content = new StringContent(JsonConvert.SerializeObject(existencia), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("/api/existencias", content);
+            var response = await _client.PostAsync("/api/existencia", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -67,19 +99,23 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task UpdateExistencia_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
             var existencia = new Existencia
             {
-                Id = existenciaId,
-                Nombre = "Existencia Test Actualizada",
-                Descripcion = "Descripción Test Actualizada",
-                Codigo = "EX1234",
-                UnidadMedida = UnidadMedida.Litro,
-                EstadoEntidad = EstadoEntidad.Activo
+                Id = 1,
+                Nombre = "Otra Existencia Test",
+                Descripcion = "Otra Descripción Test",
+                TipoProducto = TipoProducto.Accesorio,
+                Marca = "Generico",
+                EstadoEntidad = EstadoEntidad.Activo,
+
+                Codigo = "EX124",
+                UnidadMedida = UnidadMedida.Kilogramo
             };
+
             var content = new StringContent(JsonConvert.SerializeObject(existencia), Encoding.UTF8, "application/json");
-            var response = await client.PutAsync($"/api/existencias/{existenciaId}", content);
+            var response = await _client.PutAsync($"/api/existencia/{existenciaId}", content);
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -87,11 +123,11 @@ namespace RetailProductMicroservice.Tests.IntegrationTests
         [Fact]
         public async Task DeleteExistencia_ReturnsSuccessStatusCode()
         {
-            var client = _factory.CreateClient();
+            await InitializeDatabaseAsync();
             var existenciaId = 1;
-            var response = await client.DeleteAsync($"/api/existencias/{existenciaId}");
+            var response = await _client.DeleteAsync($"/api/existencia/{existenciaId}");
             response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }

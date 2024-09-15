@@ -48,7 +48,7 @@ namespace RetailProductMicroservice.API.Controllers
                 return BadRequest();
             }
             await _serializableService.UpdateSerializableAsync(serializable);
-            return NoContent();
+            return Ok(serializable);
         }
 
         [HttpDelete("{id}")]
@@ -56,7 +56,7 @@ namespace RetailProductMicroservice.API.Controllers
         {
             // test 123
             await _serializableService.DeleteSerializableAsync(id);
-            return NoContent();
+            return Ok();
         }
     }
 }

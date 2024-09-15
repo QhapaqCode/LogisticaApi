@@ -37,5 +37,10 @@ namespace RetailProductMicroservice.Application.Services
         {
             await _existenciaRepository.DeleteExistenciaAsync(id);
         }
+
+        public async Task Clear()
+        {
+            await _existenciaRepository.Clear();
+        }
     }
 }

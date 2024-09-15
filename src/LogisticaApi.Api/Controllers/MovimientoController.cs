@@ -91,7 +91,7 @@ namespace RetailProductMicroservice.API.Controllers
                 return BadRequest();
             }
             await _movimientoService.UpdateMovimientoAsync(movimiento);
-            return NoContent();
+            return Ok(movimiento);
         }
 
         [HttpDelete("{id}")]
