@@ -45,7 +45,7 @@ namespace RetailProductMicroservice.Api
             }
             else
             {
-                // Configura la base de datos real aquí
+                // Configura la base de datos real aquï¿½
                 services.AddDbContext<RetailProductContext>(options =>
                     options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
             }
