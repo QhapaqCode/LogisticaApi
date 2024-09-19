@@ -32,6 +32,10 @@ namespace RetailProductMicroservice.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Movimiento>()
+                .Property(m => m.Cantidad)
+                .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<Movimiento>()
                 .HasOne(m => m.Anaquel)
                 .WithMany()
                 .HasForeignKey(m => m.AnaquelId)
