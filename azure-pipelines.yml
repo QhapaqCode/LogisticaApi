@@ -1,16 +1,13 @@
 # Docker
 # Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - develop
-
 resources:
 - repo: self
-
 variables:
   tag: '$(Build.BuildId)'
-
+  imageName: 'genomike/logisticaapi'
 stages:
 - stage: Build
   displayName: Build image
@@ -26,4 +23,12 @@ stages:
         command: build
         dockerfile: 'Dockerfile'
         tags: |
+          $(imageName):$(tag)
+    - task: Docker@2
+      displayName: Push an image
+      inputs:
+        command: push
+        repository: $(imageName)
+        tags: |
           $(tag)
+        containerRegistry: 'DockerHub'

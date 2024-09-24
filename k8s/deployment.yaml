@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
       - name: logisticaapi
-        image: logisticaapi:latest
-        imagePullPolicy: Never
+        image: genomike/logisticaapi:latest
         ports:
         - containerPort: 8085
         env:
