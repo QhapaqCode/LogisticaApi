@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logisticaapi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logisticaapi
+  template:
+    metadata:
+      labels:
+        app: logisticaapi
+    spec:
+      containers:
+      - name: logisticaapi
+        image: logisticaapi:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8085
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
