@@ -1,0 +1,13 @@
+services:
+  logisticaapi:
+    image: logisticaapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8085"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
