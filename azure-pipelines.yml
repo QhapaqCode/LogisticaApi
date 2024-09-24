@@ -10,10 +10,10 @@ variables:
   imageName: 'genomike/logisticaapi'
 stages:
 - stage: Build
-  displayName: Build image
+  displayName: Build and Push Docker Image
   jobs:
-  - job: Build
-    displayName: Build
+  - job: BuildAndPush
+    displayName: Build and Push
     pool:
       vmImage: ubuntu-latest
     steps:
@@ -24,6 +24,7 @@ stages:
         dockerfile: 'Dockerfile'
         tags: |
           $(imageName):$(tag)
+          $(imageName):latest
     - task: Docker@2
       displayName: Push an image
       inputs:
@@ -31,4 +32,5 @@ stages:
         repository: $(imageName)
         tags: |
           $(tag)
+          latest
         containerRegistry: 'DockerHub'
