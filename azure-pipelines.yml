@@ -1,5 +1,12 @@
 trigger:
-- develop
+  branches:
+    include:
+      - develop
+pr:
+  branches:
+    exclude:
+      - develop
+
 resources:
 - repo: self
 variables:
@@ -24,6 +31,8 @@ stages:
           $(imageName):latest
     - script: docker images
       displayName: List Docker images
+    - script: docker tag f8132086a00e $(imageName):$(tag)
+      displayName: Tag Docker image
     - task: Docker@2
       displayName: Push an image
       inputs:
