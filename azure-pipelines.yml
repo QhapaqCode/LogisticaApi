@@ -31,7 +31,7 @@ stages:
           $(imageName):latest
     - script: docker images
       displayName: List Docker images
-    - script: docker tag $(docker images -q | head -n 1) $(imageName):$(tag)
+    - script: docker tag $(imageName):$(tag) $(imageName):latest
       displayName: Tag Docker image
     - script: |
         if [ -z "$(docker images -q $(imageName):$(tag))" ]; then
