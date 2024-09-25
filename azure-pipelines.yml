@@ -22,7 +22,7 @@ stages:
       vmImage: ubuntu-latest
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build and Tag Docker image
       inputs:
         command: build
         dockerfile: 'Dockerfile'
@@ -31,7 +31,14 @@ stages:
           $(imageName):latest
     - script: docker images
       displayName: List Docker images
-    - script: docker tag $(imageName):$(tag) $(imageName):latest
+    - script: |
+        IMAGE_ID=$(docker images -q $(imageName):$(tag))
+        if [ -n "$IMAGE_ID" ]; then
+          docker tag $IMAGE_ID $(imageName):latest
+        else
+          echo "Image $(imageName):$(tag) not found!"
+          exit 1
+        fi
       displayName: Tag Docker image
     - script: |
         if [ -z "$(docker images -q $(imageName):$(tag))" ]; then
