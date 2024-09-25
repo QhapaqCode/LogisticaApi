@@ -31,8 +31,14 @@ stages:
           $(imageName):latest
     - script: docker images
       displayName: List Docker images
-    - script: docker tag f8132086a00e $(imageName):$(tag)
+    - script: docker tag $(docker images -q | head -n 1) $(imageName):$(tag)
       displayName: Tag Docker image
+    - script: |
+        if [ -z "$(docker images -q $(imageName):$(tag))" ]; then
+          echo "Image not found!"
+          exit 1
+        fi
+      displayName: Verify Docker image
     - task: Docker@2
       displayName: Push an image
       inputs:
