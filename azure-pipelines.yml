@@ -26,18 +26,9 @@ stages:
       inputs:
         command: build
         dockerfile: 'Dockerfile'
-        tags: $(imageName):$(tag)
+        tags: 'genomike/logisticaapi:latest'
     - script: docker images
       displayName: List Docker images
-    - script: |
-        IMAGE_ID=$(docker images -q $(imageName):$(tag))
-        if [ -n "$IMAGE_ID" ]; then
-          docker tag $IMAGE_ID $(imageName):latest
-        else
-          echo "Image $(imageName):$(tag) not found!"
-          exit 1
-        fi
-      displayName: Tag Docker image
     - script: |
         if [ -z "$(docker images -q $(imageName):$(tag))" ]; then
           echo "Image not found!"
@@ -48,6 +39,6 @@ stages:
       displayName: Push an image
       inputs:
         command: push
-        repository: $(imageName)
-        tags: $(tag)
+        repository: 'genomike/logisticaapi'
+        tags: 'latest'
         containerRegistry: 'DockerHub'
