@@ -10,7 +10,7 @@ pr:
 resources:
 - repo: self
 variables:
-  tag: '$(Build.BuildId)'
+  tag: 'latest'
   imageName: 'genomike/logisticaapi'
 stages:
 - stage: Build
@@ -26,9 +26,7 @@ stages:
       inputs:
         command: build
         dockerfile: 'Dockerfile'
-        tags: |
-          $(imageName):$(tag)
-          $(imageName):latest
+        tags: $(imageName):$(tag)
     - script: docker images
       displayName: List Docker images
     - script: |
@@ -51,7 +49,5 @@ stages:
       inputs:
         command: push
         repository: $(imageName)
-        tags: |
-          $(tag)
-          latest
+        tags: $(tag)
         containerRegistry: 'DockerHub'
