@@ -1,7 +1,3 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
   branches:
     include:
@@ -13,6 +9,7 @@ resources:
 variables:
   tag: '$(Build.BuildId)'
   imageName: 'logisticaapi'
+  DOCKER_USERNAME: 'genomike'
 
 stages:
 - stage: Build
@@ -26,7 +23,7 @@ stages:
     - script: |
         echo "Tag: $(tag)"
       displayName: Print tag
-    - script: docker build -t $(imageName):$(tag) .
+    - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) .
       displayName: Build and tag Docker image
     - script: docker images
       displayName: List Docker images
@@ -34,7 +31,7 @@ stages:
       displayName: Push an image
       inputs:
         command: push
-        repository: "genomike/$(imageName)"
+        repository: $(DOCKER_USERNAME)/$(imageName)
         tags: |
           $(tag)
           latest
