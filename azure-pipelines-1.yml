@@ -12,6 +12,7 @@ resources:
 
 variables:
   tag: '$(Build.BuildId)'
+  imageName: 'logisticaapi'
 
 stages:
 - stage: Build
@@ -22,17 +23,10 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        tags: |
-          $(tag)
     - script: |
         echo "Tag: $(tag)"
       displayName: Print tag
-    - script: docker build -t myrepository:$(tag) $(Build.SourcesDirectory)
+    - script: docker build -t $(imageName):$(tag) .
       displayName: Build and tag Docker image
     - script: docker images
       displayName: List Docker images
