@@ -12,7 +12,7 @@ resources:
 
 variables:
   tag: '$(Build.BuildId)'
-  imageName: 'logisticaapi'
+  imageName: 'genomike/logisticaapi'
 
 stages:
 - stage: Build
