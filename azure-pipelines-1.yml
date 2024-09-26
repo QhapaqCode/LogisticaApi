@@ -25,6 +25,8 @@ stages:
       displayName: Print tag
     - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) .
       displayName: Build and tag Docker image
+    - script: docker tag $(DOCKER_USERNAME)/$(imageName):$(tag) $(DOCKER_USERNAME)/$(imageName):latest
+      displayName: Tag image as latest
     - script: docker images
       displayName: List Docker images
     - task: Docker@2
