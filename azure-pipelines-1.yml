@@ -2,6 +2,10 @@ trigger:
   branches:
     include:
       - develop
+pr:
+  branches:
+    exclude:
+      - develop
 
 resources:
 - repo: self
