@@ -34,7 +34,7 @@ stages:
       displayName: Push an image
       inputs:
         command: push
-        repository: $(imageName)
+        repository: "genomike/$(imageName)"
         tags: |
           $(tag)
           latest
