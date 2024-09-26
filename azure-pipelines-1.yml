@@ -32,5 +32,7 @@ stages:
     - script: |
         echo "Tag: $(tag)"
       displayName: Print tag
+    - script: docker build -t myrepository:$(tag) $(Build.SourcesDirectory)
+      displayName: Build and tag Docker image
     - script: docker images
       displayName: List Docker images
