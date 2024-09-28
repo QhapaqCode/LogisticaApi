@@ -19,9 +19,5 @@
    FROM base AS final
    WORKDIR /app
    COPY --from=publish /app/publish .
-   COPY ["src/LogisticaApi.Api/appsettings.json", "./appsettings.json"]
-   ARG DEFAULT_CONNECTION
-   ENV DEFAULT_CONNECTION=${DEFAULT_CONNECTION}
-   ENV ASPNETCORE_ENVIRONMENT=Production
    ENTRYPOINT ["dotnet", "LogisticaApi.Api.dll"]
    
