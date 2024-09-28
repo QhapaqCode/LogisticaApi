@@ -27,7 +27,7 @@ stages:
     - script: |
         echo "Tag: $(tag)"
       displayName: Print tag
-    - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) --build-arg DEFAULT_CONNECTION=$(SQL_CONNECTION) .
+    - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) --build-arg DEFAULT_CONNECTION='$(SQL_CONNECTION)' .
       displayName: Build and tag Docker image
     - script: docker tag $(DOCKER_USERNAME)/$(imageName):$(tag) $(DOCKER_USERNAME)/$(imageName):latest
       displayName: Tag image as latest
