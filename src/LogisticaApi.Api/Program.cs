@@ -11,6 +11,7 @@ namespace RetailProductMicroservice.Api
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
             {
+				config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 config.AddEnvironmentVariables();
             })
                 .ConfigureWebHostDefaults(webBuilder =>
