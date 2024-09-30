@@ -20,6 +20,7 @@
    WORKDIR /app
    COPY --from=publish /app/publish .
    COPY src/LogisticaApi.Api/appsettings.json /app/config/appsettings.json
+   ARG DEFAULT_CONNECTION
    ENV DEFAULT_CONNECTION=${DEFAULT_CONNECTION}
    RUN echo "DEFAULT_CONNECTION=${DEFAULT_CONNECTION}"
    ENTRYPOINT ["dotnet", "LogisticaApi.Api.dll"]
