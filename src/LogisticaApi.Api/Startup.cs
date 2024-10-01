@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RetailProductMicroservice.Api.Configuration;
 using RetailProductMicroservice.Api.Services;
 using RetailProductMicroservice.API.Controllers;
 using RetailProductMicroservice.Application.Interfaces;
@@ -34,10 +35,9 @@ namespace RetailProductMicroservice.Api
 
             services.AddControllers();
 
-            //services.AddDbContext<RetailProductContext>(options =>
-            //    options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+            var appSettings = new AppSettings(_configuration);
 
-            bool useInMemoryDatabase = _configuration.GetValue<bool>("UseInMemoryDatabase");
+            bool useInMemoryDatabase = appSettings.UseInMemoryDatabase;
             if (useInMemoryDatabase)
             {
                 services.AddDbContext<RetailProductContext>(options =>
@@ -45,9 +45,8 @@ namespace RetailProductMicroservice.Api
             }
             else
             {
-                // Configura la base de datos real aqu�
                 services.AddDbContext<RetailProductContext>(options =>
-                    options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+                    options.UseSqlServer(appSettings.DefaultConnection));
             }
 
             services.AddScoped<IAlmacenService, AlmacenService>();
@@ -62,6 +61,8 @@ namespace RetailProductMicroservice.Api
             services.AddScoped<IMovimientoRepository, MovimientoRepository>();
             services.AddScoped<ISerializableRepository, SerializableRepository>();
             services.AddScoped<IProductoRepository, ProductoRepository>();
+            services.AddSingleton<AppSettings>();
+
 
             services.AddScoped<AlmacenController>();
 

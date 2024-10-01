@@ -29,7 +29,7 @@ namespace RetailProductMicroservice.Infrastructure.Data
                 .HasOne(m => m.Almacen)
                 .WithMany()
                 .HasForeignKey(m => m.AlmacenId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Movimiento>()
                 .Property(m => m.Cantidad)
@@ -39,13 +39,13 @@ namespace RetailProductMicroservice.Infrastructure.Data
                 .HasOne(m => m.Anaquel)
                 .WithMany()
                 .HasForeignKey(m => m.AnaquelId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Movimiento>()
                 .HasOne(m => m.Producto)
                 .WithMany()
                 .HasForeignKey(m => m.ProductoId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Anaquel>()
                 .HasOne(a => a.Almacen)
