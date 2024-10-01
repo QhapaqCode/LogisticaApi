@@ -19,4 +19,6 @@ spec:
         - containerPort: 8085
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Production"
+          value: "Development"
+        - name: DEFAULT_CONNECTION
+          value: "Server=192.168.0.15,1433;Database=retailproduct;User ID=henry;Password=123456;TrustServerCertificate=True;"

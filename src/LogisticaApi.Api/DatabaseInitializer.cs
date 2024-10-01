@@ -1,7 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using RetailProductMicroservice.Api.Configuration;
 using RetailProductMicroservice.Infrastructure.Data;
 
 namespace RetailProductMicroservice.Api.Services
@@ -9,19 +6,19 @@ namespace RetailProductMicroservice.Api.Services
     public class DatabaseInitializer
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
         private readonly ILogger<DatabaseInitializer> _logger;
 
-        public DatabaseInitializer(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DatabaseInitializer> logger)
+        public DatabaseInitializer(IServiceProvider serviceProvider, ILogger<DatabaseInitializer> logger, AppSettings appSettings)
         {
             _serviceProvider = serviceProvider;
-            _configuration = configuration;
+            _appSettings = appSettings;
             _logger = logger;
         }
 
         public void Initialize()
         {
-            var updateDatabaseOnInit = _configuration.GetValue<string>("UpdateDatabaseOnInit");
+            var updateDatabaseOnInit = _appSettings.UpdateDatabaseOnInit;
 
             if (updateDatabaseOnInit == "Active")
             {
