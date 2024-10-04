@@ -24,9 +24,6 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - script: |
-        echo "Connection: $(SQL_CONNECTION)"
-      displayName: Print SQL connection string
     - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) --build-arg DEFAULT_CONNECTION='$(SQL_CONNECTION)' .
       displayName: Build and tag Docker image
     - script: docker tag $(DOCKER_USERNAME)/$(imageName):$(tag) $(DOCKER_USERNAME)/$(imageName):latest
