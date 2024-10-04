@@ -22,3 +22,10 @@ spec:
           value: "Development"
         - name: DEFAULT_CONNECTION
           value: "Server=192.168.0.15,1433;Database=retailproduct;User ID=henry;Password=123456;TrustServerCertificate=True;"
+      - name: logisticaclient
+        image: genomike/logisticaclient:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ENV_SERVER_URL
+          value: "http://localhost:8081"
