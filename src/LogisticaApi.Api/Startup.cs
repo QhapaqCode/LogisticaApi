@@ -1,4 +1,10 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using RetailProductMicroservice.Api.Configuration;
 using RetailProductMicroservice.Api.Services;
@@ -63,7 +69,6 @@ namespace RetailProductMicroservice.Api
             services.AddScoped<IProductoRepository, ProductoRepository>();
             services.AddSingleton<AppSettings>();
 
-
             services.AddScoped<AlmacenController>();
 
             services.AddSwaggerGen(c =>
@@ -72,6 +77,8 @@ namespace RetailProductMicroservice.Api
             });
 
             services.AddSingleton<DatabaseInitializer>();
+            services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy());
         }
 
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
@@ -92,6 +99,11 @@ namespace RetailProductMicroservice.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/healthz");
+                endpoints.MapHealthChecks("/ready", new HealthCheckOptions
+                {
+                    Predicate = _ => false // Use this to differentiate between liveness and readiness checks
+                });
             });
 
             app.UseSwagger();
