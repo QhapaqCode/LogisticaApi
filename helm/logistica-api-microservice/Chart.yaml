@@ -1,0 +1,20 @@
+apiVersion: v2
+name: logistica-api-microservice
+description: A Helm chart for the Logistica API microservice
+
+# La versión del chart
+version: 0.1.0
+
+# La versión de la aplicación que este chart despliega
+appVersion: "latest"
+
+# Mantenedores del chart
+maintainers:
+  - name: Henry
+    email: genomikel@gmail.com
+
+# Dependencias del chart (opcional)
+# dependencies:
+#   - name: redis
+#     version: "14.8.8"
+#     repository: "https://charts.bitnami.com/bitnami"
