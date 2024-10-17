@@ -1,23 +1,22 @@
-# Patterns to ignore when building packages.
-# This supports shell glob matching, relative path matching, and
-# negation (prefixed with !). Only one pattern per line.
+# Ignorar archivos y carpetas no necesarios
 .DS_Store
-# Common VCS dirs
-.git/
-.gitignore
-.bzr/
-.bzrignore
-.hg/
-.hgignore
-.svn/
-# Common backup files
 *.swp
 *.bak
 *.tmp
 *.orig
-*~
-# Various IDEs
-.project
+*.log
+
+# Ignorar configuraciones de Git
+.git/
+.gitignore
+
+# Ignorar archivos de Helm empaquetados
+*.tgz
+
+# Ignorar archivos de documentación
+README.md
+LICENSE
+
+# Ignorar configuraciones de editor
 .idea/
-*.tmproj
 .vscode/

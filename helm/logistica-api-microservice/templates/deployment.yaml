@@ -1,49 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "logistica-api-microservice.fullname" . }}
+  name: {{ include "logisticaapi.fullname" . }}-deployment
   labels:
-    {{- include "logistica-api-microservice.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "logisticaapi.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "logistica-api-microservice.selectorLabels" . | nindent 6 }}
+      app: {{ include "logisticaapi.name" . }}  # Este es el nombre de la aplicación que selecciona los pods.
   template:
     metadata:
       labels:
-        {{- include "logistica-api-microservice.selectorLabels" . | nindent 8 }}
+        app: {{ include "logisticaapi.name" . }}  # Usa el mismo valor que en el selector.
     spec:
       containers:
-        - name: logisticaapi
-          image: "{{ .Values.image.logisticaapi.repository }}:{{ .Values.image.logisticaapi.tag }}"
-          ports:
-            - containerPort: {{ .Values.service.logisticaapi.port }}
-          env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: {{ .Values.env.ASPNETCORE_ENVIRONMENT }}
-            - name: DEFAULT_CONNECTION
-              value: {{ .Values.env.DEFAULT_CONNECTION }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.livenessProbe.logisticaapi.httpGet.path }}
-              port: {{ .Values.livenessProbe.logisticaapi.httpGet.port }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.readinessProbe.logisticaapi.httpGet.path }}
-              port: {{ .Values.readinessProbe.logisticaapi.httpGet.port }}
-        - name: logisticaclient
-          image: "{{ .Values.image.logisticaclient.repository }}:{{ .Values.image.logisticaclient.tag }}"
-          ports:
-            - containerPort: {{ .Values.service.logisticaclient.port }}
-          env:
-            - name: ENV_SERVER_URL
-              value: {{ .Values.env.ENV_SERVER_URL }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.livenessProbe.logisticaclient.httpGet.path }}
-              port: {{ .Values.livenessProbe.logisticaclient.httpGet.port }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.readinessProbe.logisticaclient.httpGet.path }}
-              port: {{ .Values.readinessProbe.logisticaclient.httpGet.port }}
+      - name: logisticaapi
+        image: "{{ .Values.logisticaapi.image.repository }}:{{ .Values.logisticaapi.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.logisticaapi.port }}
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "{{ .Values.env.ASPNETCORE_ENVIRONMENT }}"  # Agregué comillas alrededor del valor
+        - name: DEFAULT_CONNECTION
+          value: "{{ .Values.env.DEFAULT_CONNECTION }}"  # Agregué comillas alrededor del valor
+      - name: logisticaclient
+        image: "{{ .Values.logisticaclient.image.repository }}:{{ .Values.logisticaclient.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.logisticaclient.port }}
+        env:
+        - name: ENV_SERVER_URL
+          value: "{{ .Values.env.ENV_SERVER_URL }}"  # Agregué comillas alrededor del valor
