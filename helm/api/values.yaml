@@ -15,7 +15,7 @@ logisticaclient:
 env:
   ASPNETCORE_ENVIRONMENT: "Development"
   DEFAULT_CONNECTION: "Server=192.168.0.15,1433;Database=retailproduct;User ID=henry;Password=123456;TrustServerCertificate=True;"
-  ENV_SERVER_URL: "http://localhost:8081"
+  REACT_APP_ENV_SERVER_URL: "http://localhost:8081"
 
 service:
   type: LoadBalancer
