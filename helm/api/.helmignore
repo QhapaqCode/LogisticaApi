@@ -1,0 +1,22 @@
+# Ignorar archivos y carpetas no necesarios
+.DS_Store
+*.swp
+*.bak
+*.tmp
+*.orig
+*.log
+
+# Ignorar configuraciones de Git
+.git/
+.gitignore
+
+# Ignorar archivos de Helm empaquetados
+*.tgz
+
+# Ignorar archivos de documentación
+README.md
+LICENSE
+
+# Ignorar configuraciones de editor
+.idea/
+.vscode/

@@ -1,0 +1,27 @@
+replicaCount: 1
+
+logisticaapi:
+  image:
+    repository: "genomike/logisticaapi"
+    tag: "latest"
+  port: 8085
+
+logisticaclient:
+  image:
+    repository: "genomike/logisticaclient"
+    tag: "latest"
+  port: 80
+
+env:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  DEFAULT_CONNECTION: "Server=192.168.0.15,1433;Database=retailproduct;User ID=henry;Password=123456;TrustServerCertificate=True;"
+  REACT_APP_ENV_SERVER_URL: "http://localhost:8081"
+
+service:
+  type: LoadBalancer
+  api:
+    port: 8081
+    targetPort: 8085
+  client:
+    port: 8082
+    targetPort: 80
