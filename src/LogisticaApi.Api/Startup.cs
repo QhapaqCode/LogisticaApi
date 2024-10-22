@@ -52,7 +52,8 @@ namespace RetailProductMicroservice.Api
             else
             {
                 services.AddDbContext<RetailProductContext>(options =>
-                    options.UseSqlServer(appSettings.DefaultConnection));
+                    options.UseMySql(appSettings.DefaultConnection, 
+                        new MySqlServerVersion(new Version(8, 0, 40))));
             }
 
             services.AddScoped<IAlmacenService, AlmacenService>();
