@@ -19,6 +19,24 @@ namespace RetailProductMicroservice.Api
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls("http://*:8085");
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddAuthentication(options =>
+                    {
+                        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                    })
+                    .AddCookie()
+                    .AddGoogle(options =>
+                    {
+                        IConfigurationSection googleAuthNSection = 
+                            context.Configuration.GetSection("GoogleOAuth");
+
+                        options.ClientId = googleAuthNSection["ClientId"];
+                        options.ClientSecret = googleAuthNSection["ClientSecret"];
+                    });
                 });
     }
 }

@@ -14,6 +14,8 @@ using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
 using RetailProductMicroservice.Infrastructure.Data;
 using RetailProductMicroservice.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace RetailProductMicroservice.Api
 {
@@ -80,6 +82,22 @@ namespace RetailProductMicroservice.Api
             services.AddSingleton<DatabaseInitializer>();
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy());
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+            .AddCookie()
+            .AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection = 
+                    _configuration.GetSection("GoogleOAuth");
+
+                options.ClientId = googleAuthNSection["ClientId"];
+                options.ClientSecret = googleAuthNSection["ClientSecret"];
+            });
         }
 
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
@@ -95,7 +113,8 @@ namespace RetailProductMicroservice.Api
 
             app.UseCors("AllowAllOrigins");
 
-            // app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
