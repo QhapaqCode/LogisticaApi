@@ -1,0 +1,41 @@
+trigger:
+  branches:
+    include:
+      - develop
+pr:
+  branches:
+    exclude:
+      - develop
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+  imageName: 'logisticaclient'
+  DOCKER_USERNAME: 'genomike'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - script: docker build -t $(DOCKER_USERNAME)/$(imageName):$(tag) .
+      displayName: Build and tag Docker image
+    - script: docker tag $(DOCKER_USERNAME)/$(imageName):$(tag) $(DOCKER_USERNAME)/$(imageName):latest
+      displayName: Tag image as latest
+    - script: docker images
+      displayName: List Docker images
+    - task: Docker@2
+      displayName: Push an image
+      inputs:
+        command: push
+        repository: $(DOCKER_USERNAME)/$(imageName)
+        tags: |
+          $(tag)
+          latest
+        containerRegistry: 'DockerHub'
