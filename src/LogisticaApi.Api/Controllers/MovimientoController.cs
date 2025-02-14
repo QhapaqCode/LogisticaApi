@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using RetailProductMicroservice.Application.Interfaces;
 using RetailProductMicroservice.Domain.Entities;
 using RetailProductMicroservice.Domain.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailProductMicroservice.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MovimientoController : ControllerBase
     {
         private readonly IMovimientoService _movimientoService;

@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using RetailProductMicroservice.Application.Interfaces;
 using RetailProductMicroservice.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetailProductMicroservice.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SerializableController : ControllerBase
     {
         private readonly ISerializableService _serializableService;

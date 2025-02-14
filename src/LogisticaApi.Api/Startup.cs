@@ -14,6 +14,9 @@ using RetailProductMicroservice.Application.Services;
 using RetailProductMicroservice.Domain.Interfaces;
 using RetailProductMicroservice.Infrastructure.Data;
 using RetailProductMicroservice.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace RetailProductMicroservice.Api
 {
@@ -80,6 +83,21 @@ namespace RetailProductMicroservice.Api
             services.AddSingleton<DatabaseInitializer>();
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy());
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = _configuration["Jwt:Issuer"],
+                        ValidAudience = _configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]))
+                    };
+                });
         }
 
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer databaseInitializer)
@@ -95,7 +113,8 @@ namespace RetailProductMicroservice.Api
 
             app.UseCors("AllowAllOrigins");
 
-            // app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
